@@ -1,0 +1,4 @@
+<launch>
+  <node name="opencv_ros2" pkg="opencv_practice" type="opencv_ros2" output="screen"/>
+  
+</launch>
