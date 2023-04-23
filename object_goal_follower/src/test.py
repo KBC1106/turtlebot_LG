@@ -33,9 +33,11 @@ class project:
         self.servo_pub=rospy.Publisher('servo', UInt16, queue_size=1000)
         self.servo2_pub=rospy.Publisher('servo2', UInt16, queue_size=1000)
         self.ac=actionlib.SimpleActionClient('move_base', MoveBaseAction)
-        #self.ac.wait_for_server()
+        #self.ac.wait_for_server() #do 
 
         self.rot=Twist()#cmd_vel control
+        self.turn_wise=1
+
         
         self.ball_is_taken=False# ball=object
         self.choose="not" 
@@ -77,7 +79,7 @@ class project:
         
         
 
-        self.test3()
+        self.test2()
         
         # self.grap_adv()
         # self.grap()
@@ -131,12 +133,12 @@ class project:
         self.release()
 
     def test2(self):
-        #object detect and approach
+        #grap testing
         self.object_apporach()
 
         #grap and up
         self.grap_adv()
-        self.up()
+        #self.up()
 
     def test3(self):
         #set point
@@ -174,14 +176,12 @@ class project:
             self.turn(180)
             rospy.sleep(1)
 
+    def test4(self):
+        #testing searching algorithme
+        self.object_apporach()
 
-        
-
-        
-
-        
+#obejct searching and apporach-------------------------------------------------        
     def object_apporach(self):
-        #self.image_sub = rospy.Subscriber(self.img_topic, Image, self.callback)
         self.rate=rospy.Rate(1)
 
         #initalize
@@ -192,15 +192,29 @@ class project:
         self.W_buffer1=0
         self.W_buffer2=0
         self.W_buffer3=0
-        self.angle=10
+        self.angle=10       #servo base angle
+
+        self.turn_wise=1    #turn orientation
+        angle=140
+
+        t_turn=(2*PI*angle/360)/0.1
+        t_end=rospy.Time.now()+rospy.Duration(t_turn)
 
         while (self.ball_is_taken==False):
             self.image_sub=rospy.wait_for_message(self.img_topic, Image, timeout=None)
             self.callback(self.image_sub)
-            rospy.sleep(0.1)
+            
+            #turning control
+            if(t_end<rospy.Time.now()):
+                self.turn_wise=-1*self.turn_wise
+                t_end=rospy.Time.now()+rospy.Duration(t_turn)
+                self.turn(140*self.turn_wise)
+            
+            rospy.sleep(0.1)#0.1sec-> 10hz
         self.reset()
         rospy.sleep(1)
 
+#navigation moving-------------------------------------
     def move_to_goal(self, goal_point):
         goal = MoveBaseGoal()
         goal.target_pose.header.frame_id = "map" #'map'
@@ -226,6 +240,7 @@ class project:
         else:
             rospy.sleep(1)
 
+#camera data processing-----------------------------------
     def callback(self, data):
 
         # Convert image to OpenCV format
@@ -295,7 +310,7 @@ class project:
         self.pub.publish(self.rot)
         rospy.sleep(1)
     
-#turn
+#turn------------------------------------
     def turn(self, angle):# normal angle
         #initialize
         self.rot.angular.x = self.rot.angular.y = self.rot.angular.z = 0.0
@@ -527,12 +542,14 @@ class project:
     def move_to_object(self):
         
         if(self.cx==0):
+        #non founded
             text="searching"
-            self.rot.angular.z=0.1
+            self.rot.angular.z=0.1*self.turn_wise
             self.rot.linear.x=0
+        #pi/2=90    
 
-        else:
-        
+        else:  
+         #found
             obj_x=self.cx-320
 
             if(obj_x<=40 and obj_x>=-40):
