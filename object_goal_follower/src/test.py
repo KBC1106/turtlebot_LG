@@ -7,6 +7,11 @@ import rospy
 import cv2
 import actionlib
 
+#web cam
+import numpy as np
+from pyzbar.pyzbar import decode
+import os
+
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
@@ -56,7 +61,7 @@ class project:
         self.image_received = False
 
         self.img_topic = "/camPi/image_raw" #"/camera/rgb/image_raw"
-        
+        self.webcam_topic= "/camPi/image_raw"   #"/usb_cam"
 
         #initalize----------------------
         rospy.sleep(1)
@@ -78,8 +83,8 @@ class project:
 
         
         
-
-        self.test2()
+        self.web_cam()
+        #self.test2()
         
         # self.grap_adv()
         # self.grap()
@@ -179,6 +184,66 @@ class project:
     def test4(self):
         #testing searching algorithme
         self.object_apporach()
+
+#usb_cam for QR code detection
+    def web_cam(self):
+        while(1):
+            self.webcam_sub=rospy.wait_for_message(self.webcam_topic, Image, timeout=None)
+            self.webcam_callback(self.webcam_sub)
+            rospy.sleep(0.1)#0.1sec-> 10hz
+
+    def webcam_callback(self, ros_image):
+        print('got an image')
+        global bridge
+        # convert ros_image into an opencv-compatible image
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(
+                ros_image, desired_encoding="passthrough"
+            )
+        except CvBridgeError as e:
+            print(e)
+
+        # OpenCV Code goes after this comment
+        # f = open(save_path + "data.txt", "a")
+        # t = time.localtime()
+        # current_time = time.strftime("%Y-%m-%d %H:%M:%S", t)
+        for code in decode(cv_image):
+            # print(code.type)
+
+            data = code.data.decode("utf-8")
+            if code.type == "CODE128":
+                data = int(data)
+                recoveredbytes = data.to_bytes((data.bit_length() + 7) // 8, "little")
+                data = recoveredbytes[:-1].decode("utf-8").strip()  # Strip pad after decoding
+            # else:
+            #     data = code.data.decode("utf-8")
+
+            print(data)
+
+            # Get geometry of identified barcode/qrcode and draw a rectangle around it
+            pts = np.array([code.polygon], np.int32)
+            pts = pts.reshape((-1, 1, 2))
+            cv2.polylines(cv_image, [pts], True, (255, 0, 255), 5)
+
+            pts2 = code.rect
+            cv2.putText(
+                cv_image,
+                data,
+                (pts2[0], pts2[1]),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.9,
+                (255, 0, 255),
+                2,
+            )
+            # f.write(current_time + " ; " + data + "\n")
+
+        # f.close()
+        # img = cv2.resize(cv_image, (960, 600))
+        cv2.imshow("Image window", cv_image)
+        cv2.waitKey(3)
+
+
+
 
 #obejct searching and apporach-------------------------------------------------        
     def object_apporach(self):

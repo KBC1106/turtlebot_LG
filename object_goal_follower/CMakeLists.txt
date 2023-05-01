@@ -14,7 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   sensor_msgs
-  OpenCV
 )
 
 ## System dependencies are found with CMake's conventions
