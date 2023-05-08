@@ -43,7 +43,8 @@ class project:
         self.rot=Twist()#cmd_vel control
         self.turn_wise=1
 
-        
+        self.decoding=False# QR code decoding
+
         self.ball_is_taken=False# ball=object
         self.choose="not" 
         self.cx=0
@@ -61,7 +62,7 @@ class project:
         self.image_received = False
 
         self.img_topic = "/camPi/image_raw" #"/camera/rgb/image_raw"
-        self.webcam_topic= "/camPi/image_raw"   #"/usb_cam"
+        self.webcam_topic= "/usb_cam/image_raw" #"/camPi/image_raw"   #"/usb_cam"
 
         #initalize----------------------
         rospy.sleep(1)
@@ -85,7 +86,6 @@ class project:
         
         self.web_cam()
         #self.test2()
-        
         # self.grap_adv()
         # self.grap()
         # self.up()
@@ -187,7 +187,8 @@ class project:
 
 #usb_cam for QR code detection
     def web_cam(self):
-        while(1):
+        self.decoding=False
+        while(self.decoding==False):
             self.webcam_sub=rospy.wait_for_message(self.webcam_topic, Image, timeout=None)
             self.webcam_callback(self.webcam_sub)
             rospy.sleep(0.1)#0.1sec-> 10hz
@@ -209,12 +210,14 @@ class project:
         # current_time = time.strftime("%Y-%m-%d %H:%M:%S", t)
         for code in decode(cv_image):
             # print(code.type)
-
+            
+            #self.decoding=True #controll
             data = code.data.decode("utf-8")
             if code.type == "CODE128":
                 data = int(data)
                 recoveredbytes = data.to_bytes((data.bit_length() + 7) // 8, "little")
                 data = recoveredbytes[:-1].decode("utf-8").strip()  # Strip pad after decoding
+                
             # else:
             #     data = code.data.decode("utf-8")
 
@@ -408,6 +411,7 @@ class project:
         rospy.sleep(1)
         
     def show_image(self,img):
+        #show image
         cv2.imshow("Image Window", img)
         cv2.waitKey(3)
     
@@ -649,7 +653,7 @@ class project:
 if __name__ == '__main__':
 
     # Initialize
-    rospy.init_node('take_photo', anonymous=False)
+    rospy.init_node('test', anonymous=False)
     camera = project()
     camera.reset()
 
