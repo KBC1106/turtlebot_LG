@@ -7,10 +7,12 @@ import rospy
 import cv2
 import actionlib
 
-#web cam
+#web cam QR
 import numpy as np
 from pyzbar.pyzbar import decode
 import os
+import webbrowser
+
 
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
@@ -40,6 +42,7 @@ class project:
         self.ac=actionlib.SimpleActionClient('move_base', MoveBaseAction)
         #self.ac.wait_for_server() #do 
 
+        
         self.rot=Twist()#cmd_vel control
         self.turn_wise=1
 
@@ -83,9 +86,9 @@ class project:
             exit()
 
         
-        
-        self.web_cam()
-        #self.test2()
+        self.test4()
+        # self.web_cam()
+        # self.test2()
         # self.grap_adv()
         # self.grap()
         # self.up()
@@ -182,8 +185,11 @@ class project:
             rospy.sleep(1)
 
     def test4(self):
-        #testing searching algorithme
+        
         self.object_apporach()
+        self.grap_adv()
+        self.up()
+        self.web_cam()
 
 #usb_cam for QR code detection
     def web_cam(self):
@@ -211,7 +217,8 @@ class project:
         for code in decode(cv_image):
             # print(code.type)
             
-            #self.decoding=True #controll
+            self.decoding=True #controll
+            
             data = code.data.decode("utf-8")
             if code.type == "CODE128":
                 data = int(data)
@@ -222,6 +229,7 @@ class project:
             #     data = code.data.decode("utf-8")
 
             print(data)
+            webbrowser.get("firefox").open(data)#data
 
             # Get geometry of identified barcode/qrcode and draw a rectangle around it
             pts = np.array([code.polygon], np.int32)
