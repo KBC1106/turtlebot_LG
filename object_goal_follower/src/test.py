@@ -47,6 +47,7 @@ class project:
         self.turn_wise=1
 
         self.decoding=False# QR code decoding
+        self.url="none"
 
         self.ball_is_taken=False# ball=object
         self.choose="not" 
@@ -69,8 +70,8 @@ class project:
 
         #initalize----------------------
         rospy.sleep(1)
-        self.grap()
-        self.up()
+        #self.grap()
+        #self.up()
         self.down()
         self.release()
         
@@ -84,9 +85,14 @@ class project:
             print("quit")#2 quit
             self.ac.cancel_goal()				
             exit()
-
+      
+        #self.final()
+        self.final2()
+        #self.object_apporach()
+        # self.test4()
         
-        self.test4()
+        # self.grap()
+        # self.up()
         # self.web_cam()
         # self.test2()
         # self.grap_adv()
@@ -191,9 +197,236 @@ class project:
         self.up()
         self.web_cam()
 
+    def final(self):
+        start=GoalPose()
+        target1=GoalPose()
+        target2=GoalPose()
+        target3=GoalPose()
+        t1_count=0
+        t2_count=0
+        t3_count=0
+
+        small_beige="https://postechackr-my.sharepoint.com/:i:/g/personal/kbc1106_postech_ac_kr/EUMWlJrHeBVKl3qkz6VEUrgBObjcAXi774ZPM7aKz7ifNA?e=GUwdRX"
+        big_beige="https://postechackr-my.sharepoint.com/:i:/g/personal/kbc1106_postech_ac_kr/EZC80IGY5ARKpFgvNmYES0QBl_bkuDj3nru_cqMHWahE1Q?e=08n9hT"
+        big_green="https://postechackr-my.sharepoint.com/:i:/g/personal/kbc1106_postech_ac_kr/EacKNFJJRFBGlpc8z_cqGr4BHLsyl4hw4xa7TDZFr7mEvQ?e=QQGyFf"
+
+        [start.x, start.y, start.z, start.w]=[-0.829929608929,-1.04399848452,-0.0124551350763 ,0.999922431797]
+
+        [target1.x, target1.y, target1.z, target1.w]=[-1.79356720627,-2.12883711325,0.677504046583,0.735519045887]
+        [target2.x, target2.y, target2.z, target2.w]=[-0.632133384176,-3.69855689189,0.0597571750129,0.998212943231]
+        [target3.x, target3.y, target3.z, target3.w]=[-1.1118648362,-3.59825320128,-0.998536224039,0.0540870528044]
+        
+        object_number=5
+
+        for i in range (0,object_number):
+            print("remain object:", 5-i)
+            
+            self.turn(180)
+
+            #1st object grap
+            self.object_apporach()
+            self.grap_adv()
+            self.up()
+            self.web_cam()            
+            self.linear_mov(-0.4)
+            self.turn(180)
+
+            #move to the target point
+            if(self.url==small_beige):
+                self.move_to_goal(target1)
+                print("go to small_beige")
+                
+                 #relase and move
+                if(t1_count>0):
+                    self.linear_mov(0.15)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.15)
+
+                else:
+                    self.linear_mov(0.2)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.2)
+
+                self.turn(180)
+                t1_count+=1
+
+            elif(self.url==big_beige):
+                self.move_to_goal(target2)
+                print("go to big_beige")
+                 #relase and move
+                if(t2_count>0):
+                    self.linear_mov(0.15)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.15)
+
+                else:
+                    self.linear_mov(0.2)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.2)
+
+                self.turn(180)
+                t2_count+=1
+
+            elif(self.url==big_green):
+                self.move_to_goal(target3)
+                print("go to big_green")
+                if(t3_count>0):
+                    self.linear_mov(0.15)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.15)
+
+                else:
+                    self.linear_mov(0.2)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.2)
+
+                self.turn(180)
+                t3_count+=1
+
+            self.url="none"
+            self.reset()
+            #return to start point
+            rospy.sleep(1)
+            self.move_to_goal(start)
+            rospy.sleep(1)
+
+    def final2(self):
+        start=GoalPose()
+        target1=GoalPose()
+        target2=GoalPose()
+        target3=GoalPose()
+        t1_count=0
+        t2_count=0
+        t3_count=0
+
+        small_beige="https://postechackr-my.sharepoint.com/:i:/g/personal/kbc1106_postech_ac_kr/EUMWlJrHeBVKl3qkz6VEUrgBObjcAXi774ZPM7aKz7ifNA?e=GUwdRX"
+        big_beige="https://postechackr-my.sharepoint.com/:i:/g/personal/kbc1106_postech_ac_kr/EZC80IGY5ARKpFgvNmYES0QBl_bkuDj3nru_cqMHWahE1Q?e=08n9hT"
+        big_green="https://postechackr-my.sharepoint.com/:i:/g/personal/kbc1106_postech_ac_kr/EacKNFJJRFBGlpc8z_cqGr4BHLsyl4hw4xa7TDZFr7mEvQ?e=QQGyFf"
+
+        [start.x, start.y, start.z, start.w]=[-0.829929608929,-1.04399848452,-0.0124551350763 ,0.999922431797]
+        
+        [target1.x, target1.y, target1.z, target1.w]=[-1.79356720627,-2.12883711325,0.677504046583,0.735519045887]
+        [target2.x, target2.y, target2.z, target2.w]=[-0.632133384176,-3.69855689189,0.0597571750129,0.998212943231]
+        [target3.x, target3.y, target3.z, target3.w]=[-1.1118648362,-3.59825320128,-0.998536224039,0.0540870528044]
+        
+        
+        target1.x=target1.x-start.x
+        target1.y=target1.y-start.y
+
+        target2.x=target2.x-start.x
+        target2.y=target2.y-start.y
+
+        target3.x=target3.x-start.x
+        target3.y=target3.y-start.y
+
+        start.x=0
+        start.y=0
+
+        object_number=5
+
+        for i in range (0,object_number):
+            print("remain object:", 5-i)
+            
+            self.turn(180)
+
+            #1st object grap
+            self.object_apporach()
+            self.web_cam()
+            self.angle=130
+            self.grap_adv()    
+            if(self.url==small_beige):
+                self.angle=160
+                self.grap_adv()
+                
+            elif(self.url==big_beige):
+                self.angle=130
+                self.grap_adv()
+
+            elif(self.url==big_green):
+                self.angle=130
+                self.grap_adv()
+
+            self.up()
+            self.linear_mov(-0.4)
+            self.turn(180)
+
+            #move to the target point
+            if(self.url==small_beige):
+                self.move_to_goal(target1)
+                print("go to small_beige")
+                
+                 #relase and move
+                if(t1_count>0):
+                    self.linear_mov(0.15)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.15)
+
+                else:
+                    self.linear_mov(0.2)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.2)
+
+                self.turn(180)
+                t1_count+=1
+
+            elif(self.url==big_beige):
+                self.move_to_goal(target2)
+                print("go to big_beige")
+                 #relase and move
+                if(t2_count>0):
+                    self.linear_mov(0.15)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.15)
+
+                else:
+                    self.linear_mov(0.2)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.2)
+
+                self.turn(180)
+                t2_count+=1
+
+            elif(self.url==big_green):
+                self.move_to_goal(target3)
+                print("go to big_green")
+                if(t3_count>0):
+                    self.linear_mov(0.15)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.15)
+
+                else:
+                    self.linear_mov(0.2)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.2)
+
+                self.turn(180)
+                t3_count+=1
+
+            self.url="none"
+            self.reset()
+            #return to start point
+            rospy.sleep(1)
+            self.move_to_goal(start)
+            rospy.sleep(1)
+
+
+
 #usb_cam for QR code detection
     def web_cam(self):
         self.decoding=False
+        self.url="none"
         while(self.decoding==False):
             self.webcam_sub=rospy.wait_for_message(self.webcam_topic, Image, timeout=None)
             self.webcam_callback(self.webcam_sub)
@@ -217,7 +450,7 @@ class project:
         for code in decode(cv_image):
             # print(code.type)
             
-            self.decoding=True #controll
+           
             
             data = code.data.decode("utf-8")
             if code.type == "CODE128":
@@ -228,8 +461,10 @@ class project:
             # else:
             #     data = code.data.decode("utf-8")
 
-            print(data)
+            print("url is: ", data)
+            self.decoding=True #controll
             webbrowser.get("firefox").open(data)#data
+            self.url=data
 
             # Get geometry of identified barcode/qrcode and draw a rectangle around it
             pts = np.array([code.polygon], np.int32)
@@ -265,6 +500,7 @@ class project:
         self.choose="not"
         self.cx=0
         self.cy=0
+
         self.W_buffer1=0
         self.W_buffer2=0
         self.W_buffer3=0
@@ -374,10 +610,10 @@ class project:
         #compute time
         t_move=abs(x)/0.1
         t_end=rospy.Time.now()+rospy.Duration(t_move)
-        
+        print("moving")
         #executing	
         while(rospy.Time.now()<t_end):
-            print("moving")	
+            	
             self.pub.publish(self.rot)
             rospy.sleep(0.01)
         
@@ -407,9 +643,9 @@ class project:
         t_end=rospy.Time.now()+rospy.Duration(t_turn)
             
         #executing
-        print("turn")	
-        while(rospy.Time.now()<t_end):
-            print("turning")				
+        print("turn")
+        print("turning")	
+        while(rospy.Time.now()<t_end):	
             self.pub.publish(self.rot)
             rospy.sleep(0.01)
 
@@ -472,11 +708,13 @@ class project:
     def find_ball(self,img):
         hsv_frame = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-        hsv_frame = cv2.resize(hsv_frame,(640,300))#300
-        hsv_frame = hsv_frame[120:300, 0:640]
-        img = cv2.resize(img,(640,300))
-        img = img[120:300, 0:640]
+        hsv_frame = cv2.resize(hsv_frame,(640,300))#300 #640->320
+        #hsv_frame = hsv_frame[120:300, 0:640]
+        hsv_frame = hsv_frame[120:300, 160:480]
 
+        img = cv2.resize(img,(640,300))
+        #img = img[120:300, 0:640]
+        img = img[120:300, 160:480]
 
         #green
         low_H=30
@@ -501,6 +739,145 @@ class project:
         high_H2=15
         high_S2=150
         high_V2=150
+
+
+
+        #mask frame additional
+        mask_frame=cv2.inRange(hsv_frame, (low_H, low_S, low_V), (high_H, high_S, high_V))
+        mask_frame2=cv2.inRange(hsv_frame, (low_H2, low_S2, low_V2), (high_H2, high_S2, high_V2))
+
+        cv2.imshow("mask2", mask_frame2)
+        cv2.imshow("mask",mask_frame)
+        # contours, hierarchy = cv2.findContours(mask_frame,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+        c, contours, hierarchy = cv2.findContours(mask_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        c2, contours2, hierarchy2 = cv2.findContours(mask_frame2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        x, y, w, h = 0,0,0,0
+        X, Y, W, H = 0, 0, 0, 0
+        area1 = 0
+        area2 = 0
+
+        #area estimation one time
+        if(self.choose=="not"):
+            for pic, contour in enumerate(contours):
+                
+                area1 = cv2.contourArea(contour)
+
+
+            for pic, contour2 in enumerate(contours2):
+                
+                area2= cv2.contourArea(contour2)    
+
+            if(area1>area2):
+                self.choose="green"
+            else:
+                self.choose="beige"
+
+        elif(self.choose=="green"):
+
+            for pic, contour in enumerate(contours):
+            
+                area1 = cv2.contourArea(contour)
+            
+                if(area1>30):#30
+                    
+                    x, y, w, h = cv2.boundingRect(contour)
+                    if(w*h>W*H):
+                        X, Y, W, H= x, y, w, h
+            print("green_witdh: ", W)
+            print("area: ", area1)
+
+
+        elif(self.choose=="beige"):
+            
+            for pic, contour2 in enumerate(contours2):
+                area2= cv2.contourArea(contour2)
+
+                if(area2>30):#30
+                    
+                    x, y, w, h = cv2.boundingRect(contour2)
+                    if(w*h>W*H):#most large and 
+                        X, Y, W, H= x, y, w, h          
+            print("beige_witdh: ", W)
+            print("area: ", area2)
+
+
+        
+        self.cx = X+(W/2)
+        self.cy = Y+(W/2)     
+        img = cv2.rectangle(img, (X, Y),(X + W, Y + H),(0, 0, 255), 2)
+        
+        print("center: ",self.cx)
+
+
+        #servo
+        if((self.W_buffer1+self.W_buffer2+self.W_buffer3)>600):#1300
+            self.angle=130
+        else:
+            self.angle=165
+
+        if((self.cx<25)&(self.cx_buffer>50)):
+            self.ball_is_taken=True
+            print("apporached object!")
+
+        self.cx_buffer=self.cx
+        self.W_buffer1=W
+        self.W_buffer2=self.W_buffer1
+        self.W_buffer3=self.W_buffer2
+        
+        cv2.imshow("window", img)
+        cv2.waitKey(3)
+
+    def move_to_object(self):
+        
+        if(self.cx==0):
+        #non founded
+            text="searching"
+            self.rot.angular.z=0.1*self.turn_wise
+            self.rot.linear.x=0
+        #pi/2=90    
+
+        else:  
+         #found
+            #obj_x=self.cx-320#320
+            obj_x=self.cx-160#320
+
+
+            if(obj_x<=40 and obj_x>=-40):
+                text="straight"
+                self.rot.angular.z=0
+                if(self.W_buffer1<100):
+                    self.rot.linear.x=0.3#0.5
+                elif(self.W_buffer1>=100 and self.W_buffer1<200):
+                    self.rot.linear.x=0.2
+                elif(self.W_buffer1>=200):
+                    self.rot.linear.x=0.2 #0.1
+    
+            elif(obj_x>60):
+                text="Left"
+                self.rot.angular.z=-0.1
+                self.rot.linear.x=0
+            elif(obj_x<-60):
+                text="Right"
+                self.rot.angular.z=0.1
+                self.rot.linear.x=0
+
+
+        self.pub.publish(self.rot)
+        #print(text)
+
+    def reset(self):
+        self.rot.angular.z=0
+        self.rot.linear.x=0
+        self.pub.publish(self.rot)
+
+
+if __name__ == '__main__':
+
+    # Initialize
+    rospy.init_node('test', anonymous=False)
+    system = project()
+    system.reset()
 
         #beige
         # low_H=0
@@ -533,135 +910,3 @@ class project:
         #high_H=32
         #high_S=255
         #high_V=255
-
-        #mask frame additional
-        mask_frame=cv2.inRange(hsv_frame, (low_H, low_S, low_V), (high_H, high_S, high_V))
-        mask_frame2=cv2.inRange(hsv_frame, (low_H2, low_S2, low_V2), (high_H2, high_S2, high_V2))
-
-        cv2.imshow("mask2", mask_frame2)
-        cv2.imshow("mask",mask_frame)
-        # contours, hierarchy = cv2.findContours(mask_frame,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-        c, contours, hierarchy = cv2.findContours(mask_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        c2, contours2, hierarchy2 = cv2.findContours(mask_frame2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        
-        x, y, w, h = 0,0,0,0
-        X,Y,W,H=0,0,0,0
-        area = 0
-        area1 = 0
-        area2 = 0
-
-        #area estimation one time
-        if(self.choose=="not"):
-            for pic, contour in enumerate(contours):
-                
-                area1 = cv2.contourArea(contour)
-
-
-            for pic, contour2 in enumerate(contours2):
-                
-                area2= cv2.contourArea(contour2)    
-
-            if(area1>area2):
-                self.choose="green"
-            else:
-                self.choose="beige"
-
-        elif(self.choose=="green"):
-            
-            for pic, contour in enumerate(contours):
-            
-                area1 = cv2.contourArea(contour)
-            
-                if(area1>30):#30
-                    
-                    x, y, w, h = cv2.boundingRect(contour)
-                    if(w*h>W*H):
-                        X, Y, W, H= x, y, w, h
-            print("green_witdh: ", W)
-            print("area: ", area1)      
-
-        elif(self.choose=="beige"):
-            
-            for pic, contour2 in enumerate(contours2):
-                area2= cv2.contourArea(contour2)
-
-                if(area2>30):#30
-                    
-                    x, y, w, h = cv2.boundingRect(contour2)
-                    if(w*h>W*H):
-                        X, Y, W, H= x, y, w, h
-            print("beige_witdh: ", W)
-            print("area: ", area2) 
-
-        img = cv2.rectangle(img, (X, Y),(X + W, Y + H),(0, 0, 255), 2)
-        self.cx = X+(W/2)
-        self.cy = Y+(W/2)
-        print("center: ",self.cx)
-
-        #servo
-        if((self.W_buffer1+self.W_buffer2+self.W_buffer3)>1300):
-            self.angle=130
-        else:
-            self.angle=165
-
-        if((self.cx<100)&(self.cx_buffer>100)):
-            self.ball_is_taken=True
-            print("apporached object!")
-
-        self.cx_buffer=self.cx
-        self.W_buffer1=W
-        self.W_buffer2=self.W_buffer1
-        self.W_buffer3=self.W_buffer2
-        
-        cv2.imshow("window", img)
-        cv2.waitKey(3)
-
-    def move_to_object(self):
-        
-        if(self.cx==0):
-        #non founded
-            text="searching"
-            self.rot.angular.z=0.1*self.turn_wise
-            self.rot.linear.x=0
-        #pi/2=90    
-
-        else:  
-         #found
-            obj_x=self.cx-320
-
-            if(obj_x<=40 and obj_x>=-40):
-                text="straight"
-                self.rot.angular.z=0
-                if(self.W_buffer1<100):
-                    self.rot.linear.x=0.3#0.5
-                elif(self.W_buffer1>=100 and self.W_buffer1<200):
-                    self.rot.linear.x=0.2
-                elif(self.W_buffer1>=200):
-                    self.rot.linear.x=0.1
-    
-            elif(obj_x>60):
-                text="Left"
-                self.rot.angular.z=-0.1
-                self.rot.linear.x=0
-            elif(obj_x<-60):
-                text="Right"
-                self.rot.angular.z=0.1
-                self.rot.linear.x=0
-
-
-        self.pub.publish(self.rot)
-        #print(text)
-
-    def reset(self):
-        self.rot.angular.z=0
-        self.rot.linear.x=0
-        self.pub.publish(self.rot)
-
-
-if __name__ == '__main__':
-
-    # Initialize
-    rospy.init_node('test', anonymous=False)
-    camera = project()
-    camera.reset()
-
