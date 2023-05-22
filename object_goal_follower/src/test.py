@@ -87,7 +87,7 @@ class project:
             exit()
       
         #self.final()
-        self.final2()
+        self.final3()
         #self.object_apporach()
         # self.test4()
         
@@ -421,6 +421,120 @@ class project:
             self.move_to_goal(start)
             rospy.sleep(1)
 
+    def final3(self):
+        start=GoalPose()
+        target1=GoalPose()
+        target2=GoalPose()
+        target3=GoalPose()
+        t1_count=0
+        t2_count=0
+        t3_count=0
+
+        small_beige="https://postechackr-my.sharepoint.com/:i:/g/personal/kbc1106_postech_ac_kr/EUMWlJrHeBVKl3qkz6VEUrgBObjcAXi774ZPM7aKz7ifNA?e=GUwdRX"
+        big_beige="https://postechackr-my.sharepoint.com/:i:/g/personal/kbc1106_postech_ac_kr/EZC80IGY5ARKpFgvNmYES0QBl_bkuDj3nru_cqMHWahE1Q?e=08n9hT"
+        big_green="https://postechackr-my.sharepoint.com/:i:/g/personal/kbc1106_postech_ac_kr/EacKNFJJRFBGlpc8z_cqGr4BHLsyl4hw4xa7TDZFr7mEvQ?e=QQGyFf"
+
+        [start.x, start.y, start.z, start.w]=[0,0,0 ,1]
+        [target1.x, target1.y, target1.z, target1.w]=[-0.664953656044,-1.17220170618,0.726655499142,0.687002027339]
+        [target2.x, target2.y, target2.z, target2.w]=[-0.199631068336,-2.66310164953,-0.970097580944,0.242715231179]
+        [target3.x, target3.y, target3.z, target3.w]=[0.425797405635, -2.66327684698,-0.204822447855,0.978799144286]
+        
+        #for i in range (0,object_number):
+        while(1):
+
+            self.turn(180)
+
+            #apporach object
+            self.object_apporach()
+            self.linear_mov(0.05)
+
+            #grap and decoding QR
+            self.angle=130
+            self.grap_adv() 
+            self.web_cam()
+            
+            #decoding and grap hard
+            if(self.url==small_beige):
+                self.angle=160
+                self.grap_adv()
+                
+            elif(self.url==big_beige):
+                self.angle=130
+                self.grap_adv()
+
+            elif(self.url==big_green):
+                self.angle=130
+                self.grap_adv()
+
+            #grap up and move
+            self.up()
+            self.linear_mov(-0.5)
+            self.turn(180)
+
+            #move to the target point
+            if(self.url==small_beige):
+                self.move_to_goal(target1)
+                print("go to small_beige")
+                
+                 #relase and move
+                if(t1_count>0):
+                    self.linear_mov(0.2)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.2)
+
+                else:
+                    self.linear_mov(0.3)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.3)
+
+                self.turn(180)
+                t1_count+=1
+
+            elif(self.url==big_beige):
+                self.move_to_goal(target2)
+                print("go to big_beige")
+                 #relase and move
+                if(t2_count>0):
+                    self.linear_mov(0.5)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.5)
+
+                else:
+                    self.linear_mov(0.6)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.6)
+
+                self.turn(180)
+                t2_count+=1
+
+            elif(self.url==big_green):
+                self.move_to_goal(target3)
+                print("go to big_green")
+                if(t3_count>0):
+                    self.linear_mov(0.2)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.2)
+
+                else:
+                    self.linear_mov(0.3)
+                    self.down()
+                    self.release()
+                    self.linear_mov(-0.3)
+
+                self.turn(180)
+                t3_count+=1
+
+            self.url="none"
+            self.reset()
+            #return to start point
+            rospy.sleep(1)
+            self.move_to_goal(start)
+            rospy.sleep(1)   
 
 
 #usb_cam for QR code detection
